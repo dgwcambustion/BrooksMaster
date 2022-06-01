@@ -1,12 +1,17 @@
 /**
 @file
-Arduino library for communicating with Books slaves over R485, adapted from ModbusMaster.
+Arduino library for communicating with Books slaves over R485, adapted from BrooksMaster.
 
+@defgroup setup BrooksMaster Object Instantiation/Initialization
+@defgroup buffer BrooksMaster Buffer Management
+@defgroup discrete Brooks Function Codes for Discrete Coils/Inputs
+@defgroup register Brooks Function Codes for Holding/Input Registers
+@defgroup constant Brooks Function Codes, Exception Codes
 */
 /*
 
   BrooksMaster.h - Arduino library for communicating with Brooks MFCs 
-  over RS485, adapted from ModbusMaster
+  over RS485, adapted from BrooksMaster
 
   Library:: BrooksMaster
   Autor:: David Walker
@@ -194,11 +199,10 @@ class BrooksMaster
     uint16_t _u16ReadQty;                                        ///< quantity of words to read
     uint16_t _u8ResponseBuffer[ku8MaxBufferSize];               ///< buffer to store Brooks slave response; read via GetResponseBuffer()
     uint16_t _u8WriteAddress;                                   ///< slave register to which to write
-    uint16_t _u16WriteQty;                                       ///< quantity of words to write
     uint16_t _u8TransmitBuffer[ku8MaxBufferSize];               ///< buffer containing data to transmit to Brooks slave; set via SetTransmitBuffer()
     uint16_t* txBuffer; // from Wire.h -- need to clean this up Rx
     uint8_t _u8TransmitBufferIndex;
-    uint16_t u16TransmitBufferLength;
+    uint16_t _u16TransmitBufferLength;
     uint16_t* rxBuffer; // from Wire.h -- need to clean this up Rx
     uint8_t _u8ResponseBufferIndex;
     uint8_t _u8ResponseBufferLength;

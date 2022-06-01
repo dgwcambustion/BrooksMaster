@@ -1,11 +1,11 @@
 /**
 @file
-Arduino library for communicating with Books slaves over R485, adapted from ModbusMaster.
+Arduino library for communicating with Books slaves over R485, adapted from BrooksMaster.
 */
 /*
 
   BrooksMaster.h - Arduino library for communicating with Brooks MFCs 
-  over RS485, adapted from ModbusMaster
+  over RS485, adapted from BrooksMaster
 
   Library:: BrooksMaster
   Autor:: David Walker
@@ -51,7 +51,7 @@ void BrooksMaster::begin(uint8_t slave, Stream &serial)
   _u8MBSlave = slave;
   _serial = &serial;
   _u8TransmitBufferIndex = 0;
-  u16TransmitBufferLength = 0;
+  _u16TransmitBufferLength = 0;
   
 #if __BrooksMASTER_DEBUG__
   pinMode(__BrooksMASTER_DEBUG_PIN_A__, OUTPUT);
@@ -64,7 +64,7 @@ void BrooksMaster::beginTransmission(uint8_t u8Address)
 {
   _u8WriteAddress = u8Address;
   _u8TransmitBufferIndex = 0;
-  u16TransmitBufferLength = 0;
+  
 }
 
 // eliminate this function in favor of using existing MB request functions
@@ -244,6 +244,7 @@ uint8_t BrooksMaster::setTransmitBuffer(uint8_t u8Index, uint8_t u8Value)
   if (u8Index < ku8MaxBufferSize)
   {
     _u8TransmitBuffer[u8Index] = u8Value;
+	_u16TransmitBufferLength++;
     return ku8MBSuccess;
   }
   else
@@ -262,7 +263,7 @@ Clear Brooks transmit buffer.
 void BrooksMaster::clearTransmitBuffer()
 {
   uint8_t i;
-  
+  _u16TransmitBufferLength = 0;
   for (i = 0; i < ku8MaxBufferSize; i++)
   {
     _u8TransmitBuffer[i] = 0;
@@ -305,7 +306,6 @@ written.
 uint8_t BrooksMaster::writeRegister(uint8_t u8WriteAddress)
 {
   _u8Command = u8WriteAddress;
-  _u16WriteQty = 4;
   return BrooksMasterTransaction(ku8MBWriteRegister);
 }
 
@@ -358,21 +358,14 @@ uint8_t BrooksMaster::BrooksMasterTransaction(uint8_t u8MBFunction)
 		u8BrooksADU[u8BrooksADUSize++] = 0; //Byte Count
 		break;
     case ku8MBWriteRegister:
-		u8BrooksADU[u8BrooksADUSize++] = 5; //Byte Count
+		u8BrooksADU[u8BrooksADUSize++] = _u16TransmitBufferLength; //Byte Count
 		break;
   }
   
   switch(u8MBFunction)
   {
     case ku8MBWriteRegister:
-		u8BrooksADU[u8BrooksADUSize++] = 57; //Unit Code (percent)
-		break;
-  }
-  
-  switch(u8MBFunction)
-  {
-    case ku8MBWriteRegister:
-      for (i = 0; i < _u16WriteQty; i++)
+      for (i = 0; i < _u16TransmitBufferLength; i++)
       {
         u8BrooksADU[u8BrooksADUSize++] = _u8TransmitBuffer[i]; //data to write
       }
@@ -533,7 +526,7 @@ uint8_t BrooksMaster::BrooksMasterTransaction(uint8_t u8MBFunction)
   }
   
   _u8TransmitBufferIndex = 0;
-  u16TransmitBufferLength = 0;
+  _u16TransmitBufferLength = 0;
   _u8ResponseBufferIndex = 0;
   return u8MBStatus;
 }

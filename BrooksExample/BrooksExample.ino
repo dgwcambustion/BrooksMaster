@@ -142,16 +142,16 @@ int Set_Brooks(float setpoint, BrooksMaster node){
   ifloat Flow;
   Flow.f = 100*(setpoint / 1.292)/2.0; //setpoint in g/min converted to Burkert SLPM 0°C and 1013mbar
   node.clearTransmitBuffer();
-  node.setTransmitBuffer(0, Flow.b[3]);
-  node.setTransmitBuffer(1, Flow.b[2]);
-  node.setTransmitBuffer(2, Flow.b[1]);
-  node.setTransmitBuffer(3, Flow.b[0]);
-  //node.setTransmitBuffer(0,666); 
+  node.setTransmitBuffer(0, 250); //set unit
+  node.setTransmitBuffer(1, Flow.b[3]);
+  node.setTransmitBuffer(2, Flow.b[2]);
+  node.setTransmitBuffer(3, Flow.b[1]);
+  node.setTransmitBuffer(4, Flow.b[0]);
   int result = node.writeRegister(236); //returns 0 on success
   Serial.print("Status: ");
-  Serial.print(node.getStatusBuffer(0));
+  Serial.print(node.getStatusBuffer(0), BIN);
   Serial.print(" ");
-  Serial.println(node.getStatusBuffer(1));
+  Serial.println(node.getStatusBuffer(1), BIN);
   if (result != 0) {
     // If no response from the slave, print an error message
     Serial.print("Communication error ");
